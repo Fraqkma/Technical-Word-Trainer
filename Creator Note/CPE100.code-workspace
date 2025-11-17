@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../../Learning/Course/P1/CPE100"
+		},
+		{
+			"path": "../../../../../../Learning/Course/P1/M1 Exam"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"stdio.h": "c"
+		}
+	}
+}
