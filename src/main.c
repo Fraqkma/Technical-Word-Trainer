@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "../include/ai.h"
 #include "../include/cli.h"
 #include "../include/vocab.h"
 #include "../include/store.h"
@@ -73,7 +74,7 @@ int main(void) {
                             int n = read_int("Number of questions: ");
                             if (n > 0) quiz_run(vocab, vcount, uname, n);
                         } else if (uc == 3) {
-                            printf("Review file: data/review.txt\n");
+                            ai_recommend_for_user(uname,"data/vocab.txt","data/review.txt");
                         } else if (uc == 4) {
                             extern void print_leaderboard(void);
                             print_leaderboard();
