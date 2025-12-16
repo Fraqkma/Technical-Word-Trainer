@@ -3,20 +3,21 @@
 #include <string.h>
 #include "../include/vocab.h"
 
-/* Load vocab from file into array. Simple parsing using sscanf. */
+// Load vocab from file into array
 int vocab_load(const char *path, VocabEntry list[], int max) {
     FILE *f = fopen(path, "r");
-    if (!f) return 0;
+    if (!f) 
+        return 0;
     char line[512];
     int count = 0;
     while (fgets(line, sizeof(line), f) && count < max) {
-        if (line[0] == '#') continue;
-        /* parse word|definition|tags */
+        if (line[0] == '#') 
+            continue;
         char w[MAX_WORD_LEN], d[MAX_DEF_LEN], t[MAX_TAGS_LEN];
         w[0]=d[0]=t[0]=0;
-        /* sscanf reads up to '|' using scanset */
         sscanf(line, " %63[^|]|%255[^|]|%63[^\n]", w, d, t);
-        if (w[0] == 0) continue;
+        if (w[0] == 0) 
+            continue;
         strncpy(list[count].word, w, MAX_WORD_LEN-1); list[count].word[MAX_WORD_LEN-1]=0;
         strncpy(list[count].def, d, MAX_DEF_LEN-1); list[count].def[MAX_DEF_LEN-1]=0;
         strncpy(list[count].tags, t, MAX_TAGS_LEN-1); list[count].tags[MAX_TAGS_LEN-1]=0;
@@ -26,7 +27,7 @@ int vocab_load(const char *path, VocabEntry list[], int max) {
     return count;
 }
 
-/* Save array back to file */
+// Save array back to file
 int vocab_save(const char *path, VocabEntry list[], int count) {
     FILE *f = fopen(path, "w");
     if (!f) return 0;
@@ -39,6 +40,7 @@ int vocab_save(const char *path, VocabEntry list[], int count) {
     return 1;
 }
 
+//check if it a word we need in search module
 int vocab_find(VocabEntry list[], int count, const char *word) {
     int i;
     for (i = 0; i < count; ++i) {
@@ -47,8 +49,10 @@ int vocab_find(VocabEntry list[], int count, const char *word) {
     return -1;
 }
 
+//admin add word
 int vocab_add(VocabEntry list[], int *count, const char *word, const char *def, const char *tags) {
-    if (*count >= MAX_WORDS) return 0;
+    if (*count >= MAX_WORDS) 
+        return 0;
     if (vocab_find(list, *count, word) != -1) return 0; /* already exists */
     strncpy(list[*count].word, word, MAX_WORD_LEN-1); list[*count].word[MAX_WORD_LEN-1]=0;
     strncpy(list[*count].def, def, MAX_DEF_LEN-1); list[*count].def[MAX_DEF_LEN-1]=0;
@@ -57,6 +61,7 @@ int vocab_add(VocabEntry list[], int *count, const char *word, const char *def, 
     return 1;
 }
 
+//admin delete word
 int vocab_delete(VocabEntry list[], int *count, const char *word) {
     int idx = vocab_find(list, *count, word);
     if (idx == -1) return 0;
@@ -66,6 +71,7 @@ int vocab_delete(VocabEntry list[], int *count, const char *word) {
     return 1;
 }
 
+//admin vocab list
 void vocab_list(VocabEntry list[], int count) {
     int i;
     if (count == 0) { printf("No vocabulary.\n"); return; }
