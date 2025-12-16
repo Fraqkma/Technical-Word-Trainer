@@ -1,4 +1,0 @@
-buffer|A temporary storage area in memory|systems
-thread|A sequence of executable instructions within a process|concurrency
-mutex|Mutual exclusion lock to protect shared data|concurrency
-test|test|test  

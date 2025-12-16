@@ -4,8 +4,6 @@
 #include "../include/vocab.h"
 #include "../include/store.h"
 #include "../include/quiz.h"
-#include "../include/ai.h"
-
 
 int main(void) {
     ensure_data_dir();
@@ -75,8 +73,7 @@ int main(void) {
                             int n = read_int("Number of questions: ");
                             if (n > 0) quiz_run(vocab, vcount, uname, n);
                         } else if (uc == 3) {
-                            ai_recommend_for_user(uname, "data/vocab.txt", "data/review.txt");
-
+                            printf("Review file: data/review.txt\n");
                         } else if (uc == 4) {
                             extern void print_leaderboard(void);
                             print_leaderboard();
