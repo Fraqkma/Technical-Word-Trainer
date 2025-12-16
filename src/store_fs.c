@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <time.h>
+#include "../include/store.h"
+
+#ifdef _WIN32
+  #include <direct.h> /* for _mkdir on Windows */
+#endif
+
+/* Ensure data directory exists; returns 1 on (assumed) success */
+int ensure_data_dir(void) {
+    struct stat st;
+    if (stat("data", &st) == -1) {
+        /* create directory depending on platform */
+    #ifdef _WIN32
+        _mkdir("data");
+    #else
+        mkdir("data", 0755);
+    #endif
+    }
+    return 1;
+}
+
+/* Verify username/password from data/users.txt
+   File format per line: username,password,role
+   role is "admin" or "user"
+   sets *is_admin to 1 if admin, 0 otherwise
+   returns 1 if credentials match, 0 otherwise
+*/
+int users_verify(const char *username, const char *password, int *is_admin) {
+    if (!username || !password || !is_admin) return 0;
+    FILE *f = fopen("data/users.txt", "r");
+    if (!f) return 0;
+
+    char line[512];
+    while (fgets(line, sizeof(line), f)) {
+        if (line[0] == '#') continue;
+        char user[128] = {0}, pass[128] = {0}, role[64] = {0};
+        /* parse: user,pass,role */
+        if (sscanf(line, " %127[^,],%127[^,],%63[^\n]", user, pass, role) >= 2) {
+            if (strcmp(user, username) == 0 && strcmp(pass, password) == 0) {
+                if (strcmp(role, "admin") == 0) *is_admin = 1;
+                else *is_admin = 0;
+                fclose(f);
+                return 1;
+            }
+        }
+    }
+    fclose(f);
+    return 0;
+}
+
+/* Register a new user (append to data/users.txt) */
+int users_register(const char *username, const char *password) {
+    if (!username || !password) return 0;
+
+    FILE *f = fopen("data/users.txt", "a+");
+    if (!f) return 0;
+
+    /* check existing */
+    rewind(f);
+    char line[512];
+    while (fgets(line, sizeof(line), f)) {
+        if (line[0] == '#') continue;
+        char user[128] = {0};
+        if (sscanf(line, " %127[^,],%*s", user) == 1) {
+            if (strcmp(user, username) == 0) {
+                fclose(f);
+                return 0; /* already exists */
+            }
+        }
+    }
+
+    fprintf(f, "%s,%s,user\n", username, password);
+    fclose(f);
+    return 1;
+}
+
+/* Append a wrong-answer record for review */
+int review_record(const char *username, const char *word) {
+    if (!username || !word) return 0;
+    FILE *f = fopen("data/review.txt", "a");
+    if (!f) return 0;
+
+    time_t t = time(NULL);
+    fprintf(f, "%s|%s|%ld|1\n", username, word, (long)t);
+    fclose(f);
+    return 1;
+}

@@ -1,0 +1,4 @@
+# username|word|timestamp|count
+Non|thread|1765558427|1
+Non|thread|1765559064|1
+Non|thread|1765559654|1
