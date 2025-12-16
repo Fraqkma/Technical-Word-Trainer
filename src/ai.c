@@ -7,97 +7,117 @@
    - Prints top words and top tags, and recommends other words from top tags
 */
 
-#include <stdio.h>
-#include <string.h>
-#include "../include/ai.h"
-
-#define MAX_WORDS 1000
+#include <stdio.h> // Provides standard input/output functions 
+#include <string.h>  // Provides string handling functions 
+#include "../include/ai.h" // Header file for the AI module 
+/* Maximum limits used throughout the program */
+#define MAX_WORDS 1000     
 #define MAX_WORD_LEN 128
 #define MAX_DEF_LEN 512
 #define MAX_TAG_LEN 64
 #define MAX_RECS 10
-
-/* simple structure to hold vocab info loaded from file */
+/* ---------------------------------------------------- */
+/* Data structure for storing vocabulary loaded from file */
 typedef struct {
-    char word[MAX_WORD_LEN];
-    char def[MAX_DEF_LEN];
-    char tags[MAX_TAG_LEN];
+    char word[MAX_WORD_LEN]; // The vocabulary word
+    char def[MAX_DEF_LEN]; // Definition of the word
+    char tags[MAX_TAG_LEN]; // Tags associated with the word 
 } VocabSimple;
 
-/* Helper: load vocab file into array, return count */
+/* ---------------------------------------------------- */
+/* Load vocabulary data from a file into an array */
+/* File format: word|definition|tags */
+/* Returns the number of vocabulary entries loaded */
 static int load_vocab_simple(const char *vocab_path, VocabSimple arr[], int max) {
-    FILE *f = fopen(vocab_path, "r");
-    if (!f) return 0;
-    char line[1024];
-    int count = 0;
+    FILE *f = fopen(vocab_path, "r");// Open vocabulary file in read mode
+    if (!f) return 0; // If file cannot be opened, return 0
+    char line[1024];// Buffer for reading each line from file
+    int count = 0;  // Counter for number of vocab entries loaded
+     // Read file line by line until EOF or max limit reached
     while (fgets(line, sizeof(line), f) && count < max) {
-        if (line[0] == '#') continue;
-        char w[MAX_WORD_LEN] = {0}, d[MAX_DEF_LEN] = {0}, t[MAX_TAG_LEN] = {0};
-        /* parse "word|def|tags" */
+        if (line[0] == '#') continue;// Skip comment lines
+        char w[MAX_WORD_LEN] = {0}, d[MAX_DEF_LEN] = {0}, t[MAX_TAG_LEN] = {0};// Temporary storage for word,Temporary storage for definition,Temporary storage for tags
+                 /* Parse a line using '|' as delimiter */
         if (sscanf(line, " %127[^|]|%511[^|]|%63[^\n]", w, d, t) >= 1) {
+           // Copy parsed data into vocab array
             strncpy(arr[count].word, w, MAX_WORD_LEN-1);
             strncpy(arr[count].def, d, MAX_DEF_LEN-1);
             strncpy(arr[count].tags, t, MAX_TAG_LEN-1);
-            count++;
+            count++;// Increase vocabulary count
         }
     }
-    fclose(f);
-    return count;
+    fclose(f);// Close vocabulary file
+    return count;// Return number of loaded vocabulary entries
 }
-
-/* Helper: find vocab index by word, or -1 */
+/* ---------------------------------------------------- */
+/* Find the index of a word in the vocabulary array */
+/* Returns index if found, or -1 if not found */
 static int vocab_index_by_word(VocabSimple arr[], int n, const char *word) {
+   // Loop through all vocabulary entries
     for (int i = 0; i < n; ++i) {
-        if (strcmp(arr[i].word, word) == 0) return i;
+       // Compare current vocab word with target word
+        if (strcmp(arr[i].word, word) == 0) return i;// Word found, return its index
     }
-    return -1;
+    return -1;// Word not found in vocabulary
 }
 
-/* main AI function */
+/* ---------------------------------------------------- */
+/* Main AI function */
+/* Analyzes user review history and generates recommendations */
 void ai_recommend_for_user(const char *username, const char *vocab_path, const char *review_path) {
-    if (!username) return;
+    if (!username) return;// Exit if username is NULL
 
     /* load vocab */
-    VocabSimple vocab[MAX_WORDS];
-    int vcount = load_vocab_simple(vocab_path, vocab, MAX_WORDS);
+    VocabSimple vocab[MAX_WORDS];  // Array to store vocabulary data
+    int vcount = load_vocab_simple(vocab_path, vocab, MAX_WORDS); // Number of loaded vocab words
 
-    /* arrays to count wrongs per word (index into vocab) */
+    /* Track how many times each vocabulary word was answered incorrectly */
     int wrong_count[MAX_WORDS];
-    for (int i=0;i<MAX_WORDS;i++) wrong_count[i]=0;
+    for (int i=0;i<MAX_WORDS;i++) wrong_count[i]=0;// Initialize all counts to zero
 
-    /* If a reviewed word is not in vocab, store separately */
-    char other_words[MAX_WORDS][MAX_WORD_LEN];
-    int other_count[MAX_WORDS];
-    int other_n = 0;
+    /* Store words found in review file but not in vocabulary file */
+    char other_words[MAX_WORDS][MAX_WORD_LEN];// Words not in vocab
+    int other_count[MAX_WORDS]; // Wrong count for those words
+    int other_n = 0;// Number of such words
+    // Initialize counts for non-vocabulary words
     for (int i=0;i<MAX_WORDS;i++) other_count[i]=0;
 
-    /* read review file */
+    /* Open the review history file */
     FILE *rf = fopen(review_path, "r");
     if (!rf) {
         printf("No review data found (file %s missing).\n", review_path);
-        return;
+        return;// Stop if review file cannot be opened
     }
 
-    char line[512];
+    char line[512];// Buffer for reading review file line by line
+    // Read each line from review file
     while (fgets(line, sizeof(line), rf)) {
-        if (line[0] == '#') continue;
-        char user[128] = {0}, word[128] = {0};
-        long ts = 0;
-        int cnt = 0;
+        if (line[0] == '#') continue;// Ignore comment lines
+        char user[128] = {0}, word[128] = {0};// Username from file,Reviewed word
+        long ts = 0;// Timestamp (not used in current logic)
+        int cnt = 0;// Number of wrong attempts
+
         /* expected format: username|word|timestamp|count */
         if (sscanf(line, " %127[^|]|%127[^|]|%ld|%d", user, word, &ts, &cnt) >= 2) {
+           // Process only records that match the current user
             if (strcmp(user, username) == 0) {
-                /* find word in vocab */
+               // Find the word in the vocabulary list
                 int vi = vocab_index_by_word(vocab, vcount, word);
                 if (vi >= 0) {
+                   // If the word exists in vocabulary,
+                    // increase its wrong count
                     wrong_count[vi] += (cnt>0?cnt:1);
                 } else {
-                    /* record other word */
+                    // If the word is NOT in vocabulary,
+                    // store it separately
                     int found = -1;
+                    // Check if the word was already recorded
                     for (int k=0;k<other_n;k++) if (strcmp(other_words[k], word)==0) { found=k; break; }
                     if (found>=0) other_count[found] += (cnt>0?cnt:1);
+                       // Word already exists → increase its count
                     else {
                         if (other_n < MAX_WORDS) {
+                           // New word → add to list
                             strncpy(other_words[other_n], word, MAX_WORD_LEN-1);
                             other_count[other_n] = (cnt>0?cnt:1);
                             other_n++;
@@ -107,27 +127,32 @@ void ai_recommend_for_user(const char *username, const char *vocab_path, const c
             }
         }
     }
-    fclose(rf);
+    fclose(rf);// Close review file
 
-    /* aggregate tag counts using wrong_count */
-    typedef struct { char tag[MAX_TAG_LEN]; int count; } TagCount;
-    TagCount tags[MAX_WORDS];
-    int tag_n = 0;
+  /* ---------------------------------------------------- */
+    /* Analyze which tags the user struggles with the most */
+    typedef struct { char tag[MAX_TAG_LEN]; int count; } TagCount;// Total wrong count for this tag
+    TagCount tags[MAX_WORDS];// Array to store tag statistics
+    int tag_n = 0; // Number of unique tags found
+       // Loop through all vocabulary words
     for (int i=0;i<vcount;i++) {
+        // Only analyze words with at least one mistake
         if (wrong_count[i] > 0 && vocab[i].tags[0]) {
             /* tags may be comma separated; split by comma or space */
             char tagcopy[MAX_TAG_LEN];
             strncpy(tagcopy, vocab[i].tags, MAX_TAG_LEN-1); tagcopy[MAX_TAG_LEN-1]=0;
             char *p = tagcopy;
             char *tok;
+           // Split tags using comma, semicolon, or space
             while ((tok = strtok(p, ",; ")) != NULL) {
                 p = NULL;
                 /* trim */
                 while (tok[0]==' ') tok++;
                 int found = -1;
+               // Check if this tag already exists
                 for (int t=0;t<tag_n;t++) if (strcmp(tags[t].tag, tok)==0) { found = t; break; }
-                if (found>=0) tags[found].count += wrong_count[i];
-                else {
+                if (found>=0) tags[found].count += wrong_count[i]; // Tag already exists → add to its score
+                else {  // New tag → add to tag list
                     if (tag_n < MAX_WORDS) {
                         strncpy(tags[tag_n].tag, tok, MAX_TAG_LEN-1);
                         tags[tag_n].count = wrong_count[i];
@@ -172,7 +197,9 @@ void ai_recommend_for_user(const char *username, const char *vocab_path, const c
         }
     }
 
-    /* PRINT RESULTS */
+   
+    /* ---------------------------------------------------- */
+    /* Display analysis result to the user */
     printf("\n=== AI Review Analysis for %s ===\n", username);
 
     if (top_n == 0 && other_n == 0) {
