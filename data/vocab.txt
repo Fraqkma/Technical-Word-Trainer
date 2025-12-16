@@ -1,3 +1,4 @@
+# word|definition|tags
 algorithm|a step-by-step procedure to solve a problem|programming
 array|a data structure that stores elements in contiguous memory|data-structure
 pointer|a variable that stores a memory address|c-programming
