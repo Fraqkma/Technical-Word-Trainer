@@ -65,6 +65,8 @@ int main(void) {
                         uc = read_int("Choose: ");
                         if (uc == 1) { //search a word
                             char tag[64]; //declare a user choosen word
+                            printf("\n tags: programming,data-structure,c-programming,memory,software,operating-system");
+                            printf("\n concurrency,computer-architecture,performance,networking");
                             read_line("Enter tag to search (or empty to list all): ", tag, sizeof(tag));
                             if (tag[0] != 0) {
                                 int i;
