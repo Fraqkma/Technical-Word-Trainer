@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>     // <-- สำคัญ! สำหรับ atoi()
+#include <stdlib.h>     
 #include "../include/cli.h"
 
 char* read_line(const char *prompt, char *buf, int bufsize) {
@@ -14,7 +14,7 @@ char* read_line(const char *prompt, char *buf, int bufsize) {
         return buf;
     }
 
-    /* remove newline */
+   
     size_t i;
     for (i = 0; i < bufsize && buf[i] != 0; ++i) {
         if (buf[i] == '\n') {
@@ -29,7 +29,7 @@ char* read_line(const char *prompt, char *buf, int bufsize) {
 int read_int(const char *prompt) {
     char buf[32];
     read_line(prompt, buf, sizeof(buf));
-    return atoi(buf);   // ตอนนี้ไม่ error แล้ว
+    return atoi(buf);   
 }
 
 void show_main_menu(void) {
