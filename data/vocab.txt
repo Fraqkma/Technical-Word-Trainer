@@ -1,4 +1,74 @@
-buffer|A temporary storage area in memory|systems
-thread|A sequence of executable instructions within a process|concurrency
-mutex|Mutual exclusion lock to protect shared data|concurrency
-kuy|kuy|kuy
+algorithm|a step-by-step procedure to solve a problem|programming
+array|a data structure that stores elements in contiguous memory|data-structure
+pointer|a variable that stores a memory address|c-programming
+stack|a data structure that follows last-in first-out order|data-structure
+queue|a data structure that follows first-in first-out order|data-structure
+heap|a region of memory used for dynamic allocation|memory
+recursion|a function calling itself to solve a problem|programming
+iteration|repeating a process using loops|programming
+variable|a named storage location in memory|programming
+function|a reusable block of code that performs a task|programming
+compiler|a program that translates source code into machine code|software
+interpreter|a program that executes code line by line|software
+syntax|rules that define the structure of a programming language|programming
+runtime|the period when a program is executing|software
+debugging|the process of finding and fixing errors|software
+exception|an error that occurs during program execution|software
+thread|the smallest unit of execution within a process|operating-system
+process|a running instance of a program|operating-system
+concurrency|multiple tasks making progress at the same time|operating-system
+parallelism|simultaneous execution of tasks|operating-system
+deadlock|a state where processes wait indefinitely for resources|operating-system
+mutex|a lock that prevents simultaneous access to shared resources|concurrency
+semaphore|a signaling mechanism for controlling access to resources|concurrency
+race condition|unexpected behavior due to simultaneous access|concurrency
+cache|small fast memory that stores frequently accessed data|computer-architecture
+register|small storage location inside CPU|computer-architecture
+instruction|a command executed by the CPU|computer-architecture
+pipeline|a technique to improve CPU performance|computer-architecture
+latency|delay before a transfer of data begins|performance
+throughput|amount of data processed in a given time|performance
+bandwidth|maximum data transfer rate|networking
+protocol|rules for data communication|networking
+packet|a unit of data transmitted over a network|networking
+router|a device that forwards data packets|networking
+firewall|a system that controls network traffic|security
+encryption|the process of converting data into a secure format|security
+authentication|verifying the identity of a user|security
+authorization|granting permission to access resources|security
+hashing|converting data into a fixed-size value|security
+database|an organized collection of data|database
+query|a request for data from a database|database
+index|a structure that improves data retrieval speed|database
+transaction|a sequence of database operations|database
+normalization|organizing data to reduce redundancy|database
+filesystem|a method of storing and organizing files|operating-system
+directory|a container for files|operating-system
+path|the location of a file in a filesystem|operating-system
+kernel|the core component of an operating system|operating-system
+shell|a command-line interface to the OS|operating-system
+virtualization|creating virtual versions of computing resources|systems
+container|a lightweight isolated environment for applications|systems
+docker|a platform for containerization|systems
+cloud computing|delivering computing services over the internet|systems
+api|a set of rules for software interaction|software
+framework|a reusable software structure|software
+library|a collection of reusable code|software
+dependency|software required by another program|software
+version control|managing changes to source code|software
+git|a distributed version control system|software
+repository|a storage location for code|software
+branch|a separate line of development|software
+merge|combining changes from branches|software
+build|the process of compiling and linking code|software
+testing|verifying that software works correctly|software
+unit testing|testing individual components of software|software
+integration testing|testing combined components|software
+deployment|releasing software to users|software
+bug|an error in a program|software
+patch|a software update that fixes issues|software
+logging|recording events during program execution|software
+monitoring|observing system performance|systems
+scalability|ability to handle increased workload|systems
+availability|the degree to which a system is operational|systems
+reliability|ability to perform consistently|systems
